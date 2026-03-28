@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Mi Hucha</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Mi Hucha" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <meta name="description" content="Tu hucha digital personal" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg2: #161616;
+      --bg3: #1a1a1a;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --text: #e8e8e8;
+      --text2: #aaa;
+      --text3: #666;
+      --text4: #444;
+      --green: #4caf8a;
+      --green-bg: rgba(76,175,138,0.08);
+      --green-border: rgba(76,175,138,0.3);
+      --red: #e05c5c;
+      --red-bg: rgba(224,92,92,0.08);
+      --red-border: rgba(224,92,92,0.3);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      background: var(--bg);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overscroll-behavior: none;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 80px);
+    }
+
+    /* ── HEADER ── */
+    .header { text-align: center; padding: 28px 0 20px; }
+    .header-title { font-size: 12px; letter-spacing: 0.14em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+    .balance-wrap { display: flex; align-items: baseline; justify-content: center; gap: 2px; }
+    .balance-int { font-family: 'DM Mono', monospace; font-size: 58px; font-weight: 500; color: #f0f0f0; letter-spacing: -2px; line-height: 1; }
+    .balance-dec { font-family: 'DM Mono', monospace; font-size: 32px; font-weight: 400; color: var(--text2); }
+    .balance-cur { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 400; color: var(--text3); margin-left: 2px; }
+    .balance-change { font-size: 12px; color: var(--text4); margin-top: 6px; height: 18px; transition: color 0.3s; }
+    .balance-change.pos { color: var(--green); }
+    .balance-change.neg { color: var(--red); }
+
+    /* ── ACTIONS ── */
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+    .btn-action {
+      padding: 15px 0; border-radius: 14px; border: 1px solid; font-size: 15px; font-weight: 500;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; letter-spacing: 0.01em;
+      -webkit-user-select: none; user-select: none;
+    }
+    .btn-action:active { transform: scale(0.97); }
+    .btn-add { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+    .btn-remove { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+
+    /* ── SECTION ── */
+    .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; padding: 0 2px; }
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── GOALS ── */
+    .goal-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
+    .goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .goal-name { font-size: 14px; color: var(--text); }
+    .goal-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 500; margin-left: 8px; }
+    .badge-daily { background: rgba(100,149,237,0.15); color: #6495ed; }
+    .badge-monthly { background: rgba(189,132,205,0.15); color: #bd84cd; }
+    .badge-annual { background: rgba(234,179,65,0.15); color: #eab341; }
+    .goal-delete { background: none; border: none; color: var(--text4); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 0 0 6px; }
+    .goal-bar { height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
+    .goal-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+    .fill-daily { background: #6495ed; }
+    .fill-monthly { background: #bd84cd; }
+    .fill-annual { background: #eab341; }
+    .goal-amounts { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; font-family: 'DM Mono', monospace; }
+    .goal-cur { color: var(--text3); }
+    .goal-tgt { color: var(--text4); }
+    .goal-done { color: var(--green) !important; }
+    .add-goal-btn {
+      width: 100%; padding: 12px; background: transparent; border: 1px dashed #2a2a2a;
+      border-radius: 12px; color: var(--text4); font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .add-goal-btn:active { border-color: #555; color: var(--text3); }
+
+    /* ── HISTORY ── */
+    .tx-item { display: flex; align-items: center; padding: 12px 14px; border-radius: 12px; margin-bottom: 6px; background: var(--bg2); border: 1px solid var(--border); }
+    .tx-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+    .tx-dot.add { background: var(--green); }
+    .tx-dot.remove { background: var(--red); }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-comment { font-size: 13px; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-comment.empty { color: var(--text4); font-style: italic; }
+    .tx-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .tx-amount { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; flex-shrink: 0; }
+    .tx-amount.add { color: var(--green); }
+    .tx-amount.remove { color: var(--red); }
+    .empty-state { text-align: center; padding: 32px 0; color: var(--text4); font-size: 13px; }
+
+    /* ── MODAL ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.22s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #111; border: 1px solid #222;
+      border-radius: 22px 22px 0 0;
+      padding: 20px 20px calc(var(--safe-bottom) + 20px);
+      width: 100%; max-width: 480px;
+      transform: translateY(30px); transition: transform 0.25s cubic-bezier(0.32,0.72,0,1);
+    }
+    .overlay.open .modal { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: #2a2a2a; border-radius: 2px; margin: 0 auto 18px; }
+    .modal-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 18px; }
+    .modal-title .gc { color: var(--green); }
+    .modal-title .rc { color: var(--red); }
+
+    .input-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .input-wrap { margin-bottom: 12px; }
+    .field {
+      width: 100%; background: var(--bg3); border: 1px solid #2a2a2a; border-radius: 12px;
+      padding: 13px 15px; color: var(--text); font-size: 16px; font-family: 'DM Mono', monospace;
+      outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
+    }
+    .field:focus { border-color: #3a3a3a; }
+    .field::placeholder { color: var(--text4); }
+    .field.text-field { font-family: 'DM Sans', sans-serif; }
+    .field.error { border-color: var(--red) !important; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+    .btn-confirm {
+      width: 100%; padding: 15px; border-radius: 14px; border: none; font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-top: 4px; font-family: inherit; transition: all 0.15s; letter-spacing: 0.01em;
+    }
+    .btn-confirm:active { transform: scale(0.98); }
+    .btn-confirm.add { background: var(--green); color: #081a12; }
+    .btn-confirm.remove { background: var(--red); color: #1a0808; }
+    .btn-confirm.goal-c { background: var(--green); color: #081a12; }
+    .btn-cancel {
+      width: 100%; padding: 13px; border-radius: 14px; border: 1px solid #222;
+      background: transparent; color: var(--text3); font-size: 14px; cursor: pointer; margin-top: 8px; font-family: inherit;
+    }
+
+    .error-msg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+    .error-msg.show { display: block; }
+
+    /* Animate balance */
+    @keyframes popIn { 0%{transform:scale(1)} 40%{transform:scale(1.03)} 100%{transform:scale(1)} }
+    .pop { animation: popIn 0.3s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">Mi Hucha</div>
+    <div class="balance-wrap" id="balance-el">
+      <span class="balance-int" id="bal-int">0</span>
+      <span class="balance-dec" id="bal-dec">,00</span>
+      <span class="balance-cur">€</span>
+    </div>
+    <div class="balance-change" id="bal-change">&nbsp;</div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn-action btn-add" onclick="openModal('add')">+ Añadir</button>
+    <button class="btn-action btn-remove" onclick="openModal('remove')">− Retirar</button>
+  </div>
+
+  <!-- GOALS -->
+  <div class="section-title">Metas de ahorro</div>
+  <div id="goals-list"></div>
+  <button class="add-goal-btn" onclick="openModal('goal')">+ Nueva meta</button>
+
+  <div class="divider"></div>
+
+  <!-- HISTORY -->
+  <div class="section-title">Historial</div>
+  <div id="tx-list"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="outsideClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title"></div>
+
+    <!-- TX FORM -->
+    <div id="tx-form">
+      <div class="input-wrap">
+        <div class="input-label">Cantidad (€)</div>
+        <input class="field" id="f-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0,00" />
+        <div class="error-msg" id="err-amount"></div>
+      </div>
+      <div class="input-wrap">
+        <div class="input-label">Comentario (opcional)</div>
+        <input class="field text-field" id="f-comment" type="text" placeholder="Ej: Bizum de Pablo" maxlength="60" />
+      </div>
+      <button class="btn-confirm" id="btn-tx" onclick="confirmTx()">Confirmar</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+
+    <!-- GOAL FORM -->
+    <div id="goal-form" style="display:none">
+      <div class="input-wrap">
+        <div class="input-label">Nombre</div>
+        <input class="field text-field" id="f-gname" type="text" placeholder="Ej: Vacaciones de verano" maxlength="40" />
+        <div class="error-msg" id="err-gname"></div>
+      </div>
+      <div class="input-row">
+        <div>
+          <div class="input-label">Objetivo (€)</div>
+          <input class="field" id="f-gtarget" type="number" inputmode="decimal" step="0.01" min="1" placeholder="500,00" />
+          <div class="error-msg" id="err-gtarget"></div>
+        </div>
+        <div>
+          <div class="input-label">Periodo</div>
+          <select class="field text-field" id="f-gtype" style="font-family:'DM Sans',sans-serif; font-size:14px;">
+            <option value="daily">Diaria</option>
+            <option value="monthly" selected>Mensual</option>
+            <option value="annual">Anual</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-confirm goal-c" onclick="confirmGoal()">Crear meta</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── STATE ── */
+  let state = { balance: 0, transactions: [], goals: [] };
+
+  function load() {
+    try {
+      const s = localStorage.getItem('hucha_v1');
+      if (s) {
+        const p = JSON.parse(s);
+        state.balance = p.balance || 0;
+        state.transactions = (p.transactions || []).map(t => ({ ...t, date: new Date(t.date) }));
+        state.goals = p.goals || [];
+      }
+    } catch(e) {}
+  }
+
+  function save() {
+    try { localStorage.setItem('hucha_v1', JSON.stringify(state)); } catch(e) {}
+  }
+
+  /* ── FORMAT ── */
+  function fmtParts(n) {
+    const abs = Math.abs(n);
+    const int = Math.floor(abs + 0.0001);
+    const dec = Math.round((abs - int) * 100).toString().padStart(2,'0');
+    return { int: int.toLocaleString('es-ES'), dec };
+  }
+
+  function fmtFull(n) {
+    const { int, dec } = fmtParts(Math.abs(n));
+    return int + ',' + dec + '€';
+  }
+
+  function fmtDate(d) {
+    return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  /* ── RENDER ── */
+  function render(change) {
+    const { int, dec } = fmtParts(state.balance);
+    document.getElementById('bal-int').textContent = int;
+    document.getElementById('bal-dec').textContent = ',' + dec;
+
+    const el = document.getElementById('balance-el');
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+
+    if (change !== undefined) {
+      const ch = document.getElementById('bal-change');
+      const sign = change >= 0 ? '+' : '−';
+      ch.textContent = sign + fmtFull(Math.abs(change));
+      ch.className = 'balance-change ' + (change >= 0 ? 'pos' : 'neg');
+      clearTimeout(window._chTimer);
+      window._chTimer = setTimeout(() => { ch.textContent = '\u00a0'; ch.className = 'balance-change'; }, 3000);
+    }
+
+    renderGoals();
+    renderHistory();
+    save();
+  }
+
+  function renderGoals() {
+    const list = document.getElementById('goals-list');
+    if (!state.goals.length) { list.innerHTML = ''; return; }
+    const labels = { daily:'Diaria', monthly:'Mensual', annual:'Anual' };
+    const badgeCls = { daily:'badge-daily', monthly:'badge-monthly', annual:'badge-annual' };
+    const fillCls = { daily:'fill-daily', monthly:'fill-monthly', annual:'fill-annual' };
+    list.innerHTML = state.goals.map((g,i) => {
+      const pct = Math.min(100, (state.balance / g.target) * 100);
+      const done = pct >= 100;
+      const cur = fmtFull(Math.min(state.balance, g.target));
+      const tgt = fmtFull(g.target);
+      return `<div class="goal-item">
+        <div class="goal-header">
+          <div style="display:flex;align-items:center">
+            <span class="goal-name">${esc(g.name)}</span>
+            <span class="goal-badge ${badgeCls[g.type]}">${labels[g.type]}</span>
+          </div>
+          <button class="goal-delete" onclick="deleteGoal(${i})">×</button>
+        </div>
+        <div class="goal-bar"><div class="goal-fill ${fillCls[g.type]}" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="goal-amounts">
+          <span class="goal-cur ${done?'goal-done':''}">${cur}${done?' ✓':''}</span>
+          <span class="goal-tgt">de ${tgt} · ${Math.round(pct)}%</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('tx-list');
+    if (!state.transactions.length) {
+      list.innerHTML = '<div class="empty-state">Sin transacciones aún</div>';
+      return;
+    }
+    list.innerHTML = [...state.transactions].reverse().map(tx => {
+      const { int, dec } = fmtParts(tx.amount);
+      const sign = tx.type === 'add' ? '+' : '−';
+      return `<div class="tx-item">
+        <div class="tx-dot ${tx.type}"></div>
+        <div class="tx-info">
+          <div class="tx-comment ${tx.comment?'':'empty'}">${tx.comment ? esc(tx.comment) : 'Sin comentario'}</div>
+          <div class="tx-date">${fmtDate(tx.date)}</div>
+        </div>
+        <div class="tx-amount ${tx.type}">${sign}${int},${dec}€</div>
+      </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── MODAL ── */
+  let modalMode = 'add';
+
+  function openModal(mode) {
+    modalMode = mode;
+    const overlay = document.getElementById('overlay');
+    const title = document.getElementById('modal-title');
+    const txf = document.getElementById('tx-form');
+    const gf = document.getElementById('goal-form');
+    const btn = document.getElementById('btn-tx');
+
+    clearErrors();
+    document.getElementById('f-amount').value = '';
+    document.getElementById('f-comment').value = '';
+    document.getElementById('f-gname').value = '';
+    document.getElementById('f-gtarget').value = '';
+
+    if (mode === 'add') {
+      txf.style.display = 'block'; gf.style.display = 'none';
+      title.innerHTML = 'Añadir <span class="gc">dinero</span>';
+      btn.className = 'btn-confirm add';
+    } else if (mode === 'remove') {
+      txf.style.display = 'block'; gf.style.display = 'none';
+      title.innerHTML = 'Retirar <span class="rc">dinero</span>';
+      btn.className = 'btn-confirm remove';
+    } else {
+      txf.style.display = 'none'; gf.style.display = 'block';
+      title.textContent = 'Nueva meta de ahorro';
+    }
+
+    overlay.classList.add('open');
+    setTimeout(() => {
+      const f = mode === 'goal' ? document.getElementById('f-gname') : document.getElementById('f-amount');
+      f.focus();
+    }, 280);
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  function outsideClick(e) {
+    if (e.target.id === 'overlay') closeModal();
+  }
+
+  function clearErrors() {
+    ['err-amount','err-gname','err-gtarget'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'error-msg'; el.textContent = '';
+    });
+    ['f-amount','f-comment','f-gname','f-gtarget'].forEach(id => {
+      document.getElementById(id).classList.remove('error');
+    });
+  }
+
+  function showError(fieldId, errId, msg) {
+    document.getElementById(fieldId).classList.add('error');
+    const e = document.getElementById(errId);
+    e.textContent = msg; e.className = 'error-msg show';
+  }
+
+  function confirmTx() {
+    clearErrors();
+    const raw = parseFloat(document.getElementById('f-amount').value);
+    if (!raw || raw <= 0 || isNaN(raw)) {
+      showError('f-amount','err-amount','Introduce una cantidad válida'); return;
+    }
+    const amount = Math.round(raw * 100) / 100;
+    if (modalMode === 'remove' && amount > state.balance) {
+      showError('f-amount','err-amount','No tienes suficiente saldo'); return;
+    }
+    const comment = document.getElementById('f-comment').value.trim();
+    const change = modalMode === 'add' ? amount : -amount;
+    state.balance = Math.round((state.balance + change) * 100) / 100;
+    state.transactions.push({ type: modalMode, amount, comment, date: new Date() });
+    closeModal();
+    render(change);
+  }
+
+  function confirmGoal() {
+    clearErrors();
+    const name = document.getElementById('f-gname').value.trim();
+    const raw = parseFloat(document.getElementById('f-gtarget').value);
+    let ok = true;
+    if (!name) { showError('f-gname','err-gname','Escribe un nombre para la meta'); ok = false; }
+    if (!raw || raw <= 0 || isNaN(raw)) { showError('f-gtarget','err-gtarget','Introduce un objetivo válido'); ok = false; }
+    if (!ok) return;
+    const type = document.getElementById('f-gtype').value;
+    state.goals.push({ name, target: Math.round(raw * 100) / 100, type });
+    closeModal();
+    render();
+  }
+
+  function deleteGoal(i) {
+    state.goals.splice(i, 1);
+    render();
+  }
+
+  /* ── KEYBOARD ── */
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('overlay').classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Enter') {
+      if (document.getElementById('goal-form').style.display !== 'none') confirmGoal();
+      else confirmTx();
+    }
+  });
+
+  /* ── SERVICE WORKER ── */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  /* ── INIT ── */
+  load();
+  render();
+</script>
+</body>
+</html>
