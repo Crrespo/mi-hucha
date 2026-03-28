@@ -1,4 +1,4 @@
-const CACHE = 'hucha-v2';
+const CACHE = 'hucha-v3';
 const BASE = '/mi-hucha';
 const ASSETS = [
   BASE + '/',
