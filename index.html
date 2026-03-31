@@ -1,188 +1,196 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Mi Hucha</title>
-
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Mi Hucha" />
   <meta name="theme-color" content="#0d0d0d" />
-  <meta name="description" content="Tu hucha digital personal" />
-
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png" />
   <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
   <style>
-    :root {
-      --bg: #0d0d0d;
-      --bg2: #161616;
-      --bg3: #1a1a1a;
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.12);
-      --text: #e8e8e8;
-      --text2: #aaa;
-      --text3: #666;
-      --text4: #444;
-      --green: #4caf8a;
-      --green-bg: rgba(76,175,138,0.08);
-      --green-border: rgba(76,175,138,0.3);
-      --red: #e05c5c;
-      --red-bg: rgba(224,92,92,0.08);
-      --red-border: rgba(224,92,92,0.3);
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      background: var(--bg);
-      font-family: 'DM Sans', -apple-system, sans-serif;
-      color: var(--text);
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      overscroll-behavior: none;
-    }
-
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 80px);
-    }
-
-    /* ── HEADER ── */
-    .header { text-align: center; padding: 28px 0 20px; }
-    .header-title { font-size: 12px; letter-spacing: 0.14em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
-    .balance-wrap { display: flex; align-items: baseline; justify-content: center; gap: 2px; }
-    .balance-int { font-family: 'DM Mono', monospace; font-size: 58px; font-weight: 500; color: #f0f0f0; letter-spacing: -2px; line-height: 1; }
-    .balance-dec { font-family: 'DM Mono', monospace; font-size: 32px; font-weight: 400; color: var(--text2); }
-    .balance-cur { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 400; color: var(--text3); margin-left: 2px; }
-    .balance-change { font-size: 12px; color: var(--text4); margin-top: 6px; height: 18px; transition: color 0.3s; }
-    .balance-change.pos { color: var(--green); }
-    .balance-change.neg { color: var(--red); }
-
-    /* ── ACTIONS ── */
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-    .btn-action {
-      padding: 15px 0; border-radius: 14px; border: 1px solid; font-size: 15px; font-weight: 500;
-      cursor: pointer; font-family: inherit; transition: all 0.15s; letter-spacing: 0.01em;
-      -webkit-user-select: none; user-select: none;
-    }
-    .btn-action:active { transform: scale(0.97); }
-    .btn-add { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
-    .btn-remove { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
-
-    /* ── SECTION ── */
-    .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; padding: 0 2px; }
-    .divider { height: 1px; background: var(--border); margin: 20px 0; }
-
-    /* ── GOALS ── */
-    .goal-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
-    .goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .goal-name { font-size: 14px; color: var(--text); }
-    .goal-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 500; margin-left: 8px; }
-    .badge-daily { background: rgba(100,149,237,0.15); color: #6495ed; }
-    .badge-monthly { background: rgba(189,132,205,0.15); color: #bd84cd; }
-    .badge-annual { background: rgba(234,179,65,0.15); color: #eab341; }
-    .goal-delete { background: none; border: none; color: var(--text4); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 0 0 6px; }
-    .goal-bar { height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
-    .goal-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-    .fill-daily { background: #6495ed; }
-    .fill-monthly { background: #bd84cd; }
-    .fill-annual { background: #eab341; }
-    .goal-amounts { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; font-family: 'DM Mono', monospace; }
-    .goal-cur { color: var(--text3); }
-    .goal-tgt { color: var(--text4); }
-    .goal-done { color: var(--green) !important; }
-    .add-goal-btn {
-      width: 100%; padding: 12px; background: transparent; border: 1px dashed #2a2a2a;
-      border-radius: 12px; color: var(--text4); font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s;
-    }
-    .add-goal-btn:active { border-color: #555; color: var(--text3); }
-
-    /* ── HISTORY ── */
-    .tx-item { display: flex; align-items: center; padding: 12px 14px; border-radius: 12px; margin-bottom: 6px; background: var(--bg2); border: 1px solid var(--border); }
-    .tx-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-    .tx-dot.add { background: var(--green); }
-    .tx-dot.remove { background: var(--red); }
-    .tx-info { flex: 1; min-width: 0; }
-    .tx-comment { font-size: 13px; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tx-comment.empty { color: var(--text4); font-style: italic; }
-    .tx-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
-    .tx-amount { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; flex-shrink: 0; }
-    .tx-amount.add { color: var(--green); }
-    .tx-amount.remove { color: var(--red); }
-    .empty-state { text-align: center; padding: 32px 0; color: var(--text4); font-size: 13px; }
-
-    /* ── MODAL ── */
-    .overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-      display: flex; align-items: flex-end; justify-content: center;
-      z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.22s;
-    }
-    .overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: #111; border: 1px solid #222;
-      border-radius: 22px 22px 0 0;
-      padding: 20px 20px calc(var(--safe-bottom) + 20px);
-      width: 100%; max-width: 480px;
-      transform: translateY(30px); transition: transform 0.25s cubic-bezier(0.32,0.72,0,1);
-    }
-    .overlay.open .modal { transform: translateY(0); }
-    .modal-handle { width: 36px; height: 4px; background: #2a2a2a; border-radius: 2px; margin: 0 auto 18px; }
-    .modal-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 18px; }
-    .modal-title .gc { color: var(--green); }
-    .modal-title .rc { color: var(--red); }
-
-    .input-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-    .input-wrap { margin-bottom: 12px; }
-    .field {
-      width: 100%; background: var(--bg3); border: 1px solid #2a2a2a; border-radius: 12px;
-      padding: 13px 15px; color: var(--text); font-size: 16px; font-family: 'DM Mono', monospace;
-      outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
-    }
-    .field:focus { border-color: #3a3a3a; }
-    .field::placeholder { color: var(--text4); }
-    .field.text-field { font-family: 'DM Sans', sans-serif; }
-    .field.error { border-color: var(--red) !important; }
-    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-
-    .btn-confirm {
-      width: 100%; padding: 15px; border-radius: 14px; border: none; font-size: 15px; font-weight: 600;
-      cursor: pointer; margin-top: 4px; font-family: inherit; transition: all 0.15s; letter-spacing: 0.01em;
-    }
-    .btn-confirm:active { transform: scale(0.98); }
-    .btn-confirm.add { background: var(--green); color: #081a12; }
-    .btn-confirm.remove { background: var(--red); color: #1a0808; }
-    .btn-confirm.goal-c { background: var(--green); color: #081a12; }
-    .btn-cancel {
-      width: 100%; padding: 13px; border-radius: 14px; border: 1px solid #222;
-      background: transparent; color: var(--text3); font-size: 14px; cursor: pointer; margin-top: 8px; font-family: inherit;
-    }
-
-    .error-msg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
-    .error-msg.show { display: block; }
-
-    /* Animate balance */
-    @keyframes popIn { 0%{transform:scale(1)} 40%{transform:scale(1.03)} 100%{transform:scale(1)} }
-    .pop { animation: popIn 0.3s ease; }
+    :root{--bg:#0d0d0d;--bg2:#161616;--bg3:#1a1a1a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8e8e8;--text2:#aaa;--text3:#666;--text4:#444;--green:#4caf8a;--green-bg:rgba(76,175,138,0.08);--green-border:rgba(76,175,138,0.3);--red:#e05c5c;--red-bg:rgba(224,92,92,0.08);--red-border:rgba(224,92,92,0.3);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{background:var(--bg);font-family:'DM Sans',-apple-system,sans-serif;color:var(--text);min-height:100vh;overscroll-behavior:none;}
+    .app{max-width:480px;margin:0 auto;padding:calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 80px);}
+    .header{text-align:center;padding:28px 0 20px;}
+    .header-title{font-size:12px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+    .balance-wrap{display:flex;align-items:baseline;justify-content:center;gap:2px;}
+    .balance-int{font-family:'DM Mono',monospace;font-size:58px;font-weight:500;color:#f0f0f0;letter-spacing:-2px;line-height:1;}
+    .balance-dec{font-family:'DM Mono',monospace;font-size:32px;color:var(--text2);}
+    .balance-cur{font-family:'DM Mono',monospace;font-size:26px;color:var(--text3);margin-left:2px;}
+    .balance-change{font-size:12px;color:var(--text4);margin-top:6px;height:18px;transition:color .3s;}
+    .balance-change.pos{color:var(--green);}.balance-change.neg{color:var(--red);}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;}
+    .btn-action{padding:15px 0;border-radius:14px;border:1px solid;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;-webkit-user-select:none;}
+    .btn-action:active{transform:scale(.97);}
+    .btn-add{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+    .btn-remove{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+    .section-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;padding:0 2px;}
+    .divider{height:1px;background:var(--border);margin:20px 0;}
+    .goal-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+    .goal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+    .goal-header-left{flex:1;min-width:0;}
+    .goal-name{font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .goal-badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;flex-shrink:0;}
+    .badge-daily{background:rgba(100,149,237,.15);color:#6495ed;}
+    .badge-monthly{background:rgba(189,132,205,.15);color:#bd84cd;}
+    .badge-annual{background:rgba(234,179,65,.15);color:#eab341;}
+    .goal-countdown{font-size:11px;color:var(--text3);margin-top:3px;}
+    .goal-countdown.urgent{color:#eab341;}
+    .goal-delete{background:none;border:none;color:var(--text4);cursor:pointer;font-size:18px;line-height:1;padding:0 0 0 6px;flex-shrink:0;}
+    .goal-bar{height:3px;background:#222;border-radius:2px;overflow:hidden;margin-bottom:6px;}
+    .goal-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+    .fill-daily{background:#6495ed;}.fill-monthly{background:#bd84cd;}.fill-annual{background:#eab341;}
+    .goal-amounts{display:flex;justify-content:space-between;font-size:11px;font-family:'DM Mono',monospace;}
+    .goal-cur{color:var(--text3);}.goal-tgt{color:var(--text4);}
+    .goal-cur.pos{color:var(--green);}.goal-cur.neg{color:var(--red);}.goal-cur.done{color:var(--green);}
+    .add-goal-btn{width:100%;padding:12px;background:transparent;border:1px dashed #2a2a2a;border-radius:12px;color:var(--text4);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;}
+    .add-goal-btn:active{border-color:#555;color:var(--text3);}
+    .tx-item{display:flex;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:6px;background:var(--bg2);border:1px solid var(--border);}
+    .tx-dot{width:8px;height:8px;border-radius:50%;margin-right:12px;flex-shrink:0;}
+    .tx-dot.add{background:var(--green);}.tx-dot.remove{background:var(--red);}
+    .tx-info{flex:1;min-width:0;}
+    .tx-comment{font-size:13px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .tx-comment.empty{color:var(--text4);font-style:italic;}
+    .tx-date{font-size:11px;color:var(--text3);margin-top:2px;}
+    .tx-right{text-align:right;flex-shrink:0;}
+    .tx-amount{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;}
+    .tx-amount.add{color:var(--green);}.tx-amount.remove{color:var(--red);}
+    .tx-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-top:2px;}
+    .empty-state{text-align:center;padding:32px 0;color:var(--text4);font-size:13px;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:flex-end;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .22s;}
+    .overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:#111;border:1px solid #222;border-radius:22px 22px 0 0;padding:20px 20px calc(var(--safe-bottom) + 20px);width:100%;max-width:480px;transform:translateY(30px);transition:transform .25s cubic-bezier(.32,.72,0,1);}
+    .overlay.open .modal{transform:translateY(0);}
+    .modal-handle{width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 18px;}
+    .modal-title{font-size:16px;font-weight:500;color:var(--text);margin-bottom:18px;}
+    .modal-title .gc{color:var(--green);}.modal-title .rc{color:var(--red);}
+    .input-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+    .input-wrap{margin-bottom:12px;}
+    .field{width:100%;background:var(--bg3);border:1px solid #2a2a2a;border-radius:12px;padding:13px 15px;color:var(--text);font-size:16px;font-family:'DM Mono',monospace;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+    .field:focus{border-color:#3a3a3a;}.field::placeholder{color:var(--text4);}
+    .field.text-field{font-family:'DM Sans',sans-serif;}.field.error{border-color:var(--red)!important;}
+    .input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .btn-confirm{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit;transition:all .15s;}
+    .btn-confirm:active{transform:scale(.98);}
+    .btn-confirm.add{background:var(--green);color:#081a12;}
+    .btn-confirm.remove{background:var(--red);color:#1a0808;}
+    .btn-confirm.goal-c{background:var(--green);color:#081a12;}
+    .btn-cancel{width:100%;padding:13px;border-radius:14px;border:1px solid #222;background:transparent;color:var(--text3);font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit;}
+    .error-msg{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+    .error-msg.show{display:block;}
+    .lock-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;cursor:pointer;}
+    .lock-toggle-label{font-size:14px;color:var(--text);}
+    .lock-toggle-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+    .toggle-switch{width:44px;height:26px;border-radius:13px;background:#222;border:1px solid var(--border);position:relative;transition:background .2s;flex-shrink:0;}
+    .toggle-switch.on{background:var(--green);}
+    .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;}
+    .toggle-switch.on::after{transform:translateX(18px);}
+    /* PIN SCREENS */
+    .pin-screen-base{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px calc(var(--safe-bottom) + 40px);}
+    .pin-logo{font-size:12px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;margin-bottom:32px;}
+    .pin-title{font-size:22px;font-weight:500;color:var(--text);margin-bottom:6px;text-align:center;}
+    .pin-subtitle{font-size:13px;color:var(--text3);margin-bottom:32px;text-align:center;min-height:20px;}
+    .pin-dots{display:flex;gap:16px;margin-bottom:40px;}
+    .pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--text4);background:transparent;transition:all .15s;}
+    .pin-dot.filled{background:var(--text);border-color:var(--text);}
+    .pin-dot.error{border-color:var(--red);background:var(--red);}
+    .pin-dot.success{border-color:var(--green);background:var(--green);}
+    .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:300px;}
+    .pin-key{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 0;font-size:22px;font-weight:400;color:var(--text);cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif;text-align:center;-webkit-user-select:none;}
+    .pin-key:active{transform:scale(.94);background:#222;}
+    .pin-key.del{font-size:18px;color:var(--text3);}
+    .pin-key.empty{background:transparent;border-color:transparent;cursor:default;}
+    .pin-blocked{font-size:13px;color:var(--red);margin-top:16px;text-align:center;}
+    .setup-step-indicator{display:flex;gap:8px;margin-bottom:28px;}
+    .setup-step-dot{width:6px;height:6px;border-radius:50%;background:var(--text4);}
+    .setup-step-dot.active{background:var(--text);}
+    .len-options{display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin-top:32px;}
+    .len-btn{padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;font-size:15px;color:var(--text);cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;}
+    .len-btn:active{background:#222;}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+    .shake{animation:shake .35s ease;}
+    @keyframes popIn{0%{transform:scale(1)}40%{transform:scale(1.03)}100%{transform:scale(1)}}
+    .pop{animation:popIn .3s ease;}
   </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- HEADER -->
+<!-- PIN LENGTH CHOOSER -->
+
+<div id="pin-length-screen" class="pin-screen-base" style="display:none">
+  <div class="pin-logo">Mi Hucha</div>
+  <div class="pin-title">Elige el PIN</div>
+  <div class="pin-subtitle">¿Cuántos dígitos quieres usar?</div>
+  <div class="len-options">
+    <button class="len-btn" onclick="choosePinLength(4)">4 dígitos</button>
+    <button class="len-btn" onclick="choosePinLength(6)">6 dígitos</button>
+  </div>
+</div>
+
+<!-- SETUP PIN -->
+
+<div id="setup-screen" class="pin-screen-base" style="display:none">
+  <div class="pin-logo">Mi Hucha</div>
+  <div class="setup-step-indicator" id="setup-steps"></div>
+  <div class="pin-title" id="setup-title">Crea tu PIN</div>
+  <div class="pin-subtitle" id="setup-subtitle"></div>
+  <div class="pin-dots" id="setup-dots"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="setupKey('1')">1</button>
+    <button class="pin-key" onclick="setupKey('2')">2</button>
+    <button class="pin-key" onclick="setupKey('3')">3</button>
+    <button class="pin-key" onclick="setupKey('4')">4</button>
+    <button class="pin-key" onclick="setupKey('5')">5</button>
+    <button class="pin-key" onclick="setupKey('6')">6</button>
+    <button class="pin-key" onclick="setupKey('7')">7</button>
+    <button class="pin-key" onclick="setupKey('8')">8</button>
+    <button class="pin-key" onclick="setupKey('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="setupKey('0')">0</button>
+    <button class="pin-key del" onclick="setupDel()">&#9003;</button>
+  </div>
+</div>
+
+<!-- LOCK SCREEN -->
+
+<div id="pin-screen" class="pin-screen-base" style="display:none">
+  <div class="pin-logo">Mi Hucha</div>
+  <div class="pin-title">Introduce tu PIN</div>
+  <div class="pin-subtitle" id="pin-subtitle">&nbsp;</div>
+  <div class="pin-dots" id="pin-dots"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">&#9003;</button>
+  </div>
+  <div class="pin-blocked" id="pin-blocked" style="display:none"></div>
+</div>
+
+<!-- MAIN APP -->
+
+<div class="app" id="main-app" style="display:none">
   <div class="header">
-    <div class="header-title">Mi Hucha</div>
+    <div class="header-title">Mi Hucha &nbsp;<span style="cursor:pointer;font-size:15px;opacity:.6" onclick="openSettings()">&#9881;</span></div>
     <div class="balance-wrap" id="balance-el">
       <span class="balance-int" id="bal-int">0</span>
       <span class="balance-dec" id="bal-dec">,00</span>
@@ -190,33 +198,24 @@
     </div>
     <div class="balance-change" id="bal-change">&nbsp;</div>
   </div>
-
-  <!-- ACTIONS -->
   <div class="actions">
     <button class="btn-action btn-add" onclick="openModal('add')">+ Añadir</button>
     <button class="btn-action btn-remove" onclick="openModal('remove')">− Retirar</button>
   </div>
-
-  <!-- GOALS -->
   <div class="section-title">Metas de ahorro</div>
   <div id="goals-list"></div>
   <button class="add-goal-btn" onclick="openModal('goal')">+ Nueva meta</button>
-
   <div class="divider"></div>
-
-  <!-- HISTORY -->
   <div class="section-title">Historial</div>
   <div id="tx-list"></div>
-
 </div>
 
 <!-- MODAL -->
+
 <div class="overlay" id="overlay" onclick="outsideClick(event)">
-  <div class="modal" id="modal">
+  <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-title"></div>
-
-    <!-- TX FORM -->
     <div id="tx-form">
       <div class="input-wrap">
         <div class="input-label">Cantidad (€)</div>
@@ -230,8 +229,6 @@
       <button class="btn-confirm" id="btn-tx" onclick="confirmTx()">Confirmar</button>
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
     </div>
-
-    <!-- GOAL FORM -->
     <div id="goal-form" style="display:none">
       <div class="input-wrap">
         <div class="input-label">Nombre</div>
@@ -246,7 +243,7 @@
         </div>
         <div>
           <div class="input-label">Periodo</div>
-          <select class="field text-field" id="f-gtype" style="font-family:'DM Sans',sans-serif; font-size:14px;">
+          <select class="field text-field" id="f-gtype" style="font-family:'DM Sans',sans-serif;font-size:14px;">
             <option value="daily">Diaria</option>
             <option value="monthly" selected>Mensual</option>
             <option value="annual">Anual</option>
@@ -256,239 +253,344 @@
       <button class="btn-confirm goal-c" onclick="confirmGoal()">Crear meta</button>
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
     </div>
+    <div id="settings-form" style="display:none">
+      <div onclick="toggleLock()" class="lock-toggle">
+        <div>
+          <div class="lock-toggle-label">Bloqueo por PIN</div>
+          <div class="lock-toggle-sub" id="lock-sub">La app se bloqueará al abrirla</div>
+        </div>
+        <div class="toggle-switch" id="lock-switch"></div>
+      </div>
+      <button class="btn-confirm goal-c" id="change-pin-btn" onclick="startChangePIN()" style="display:none;margin-bottom:0">Cambiar PIN</button>
+      <button class="btn-cancel" onclick="closeModal()">Cerrar</button>
+    </div>
   </div>
 </div>
 
 <script>
-  /* ── STATE ── */
-  let state = { balance: 0, transactions: [], goals: [] };
+var S = { balance:0, transactions:[], goals:[], pin:null, pinLen:4, lockEnabled:false };
 
-  function load() {
-    try {
-      const s = localStorage.getItem('hucha_v1');
-      if (s) {
-        const p = JSON.parse(s);
-        state.balance = p.balance || 0;
-        state.transactions = (p.transactions || []).map(t => ({ ...t, date: new Date(t.date) }));
-        state.goals = p.goals || [];
-      }
-    } catch(e) {}
-  }
-
-  function save() {
-    try { localStorage.setItem('hucha_v1', JSON.stringify(state)); } catch(e) {}
-  }
-
-  /* ── FORMAT ── */
-  function fmtParts(n) {
-    const abs = Math.abs(n);
-    const int = Math.floor(abs + 0.0001);
-    const dec = Math.round((abs - int) * 100).toString().padStart(2,'0');
-    return { int: int.toLocaleString('es-ES'), dec };
-  }
-
-  function fmtFull(n) {
-    const { int, dec } = fmtParts(Math.abs(n));
-    return int + ',' + dec + '€';
-  }
-
-  function fmtDate(d) {
-    return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-  }
-
-  /* ── RENDER ── */
-  function render(change) {
-    const { int, dec } = fmtParts(state.balance);
-    document.getElementById('bal-int').textContent = int;
-    document.getElementById('bal-dec').textContent = ',' + dec;
-
-    const el = document.getElementById('balance-el');
-    el.classList.remove('pop');
-    void el.offsetWidth;
-    el.classList.add('pop');
-
-    if (change !== undefined) {
-      const ch = document.getElementById('bal-change');
-      const sign = change >= 0 ? '+' : '−';
-      ch.textContent = sign + fmtFull(Math.abs(change));
-      ch.className = 'balance-change ' + (change >= 0 ? 'pos' : 'neg');
-      clearTimeout(window._chTimer);
-      window._chTimer = setTimeout(() => { ch.textContent = '\u00a0'; ch.className = 'balance-change'; }, 3000);
+function load(){
+  try{
+    var s=localStorage.getItem('hucha_v2');
+    if(s){
+      var p=JSON.parse(s);
+      S.balance=p.balance||0;
+      S.transactions=(p.transactions||[]).map(function(t){return Object.assign({},t,{date:new Date(t.date)});});
+      S.goals=(p.goals||[]).map(function(g){return Object.assign({},g,{startDate:new Date(g.startDate)});});
+      S.pin=p.pin||null;
+      S.pinLen=p.pinLen||4;
+      S.lockEnabled=p.lockEnabled||false;
     }
+  }catch(e){}
+}
+function save(){try{localStorage.setItem('hucha_v2',JSON.stringify(S));}catch(e){}}
 
-    renderGoals();
-    renderHistory();
-    save();
-  }
+function fmtParts(n){
+  var neg=n<0,abs=Math.abs(n),int=Math.floor(abs+0.00001),dec=Math.round((abs-int)*100).toString().padStart(2,'0');
+  return{int:(neg?'−':'')+int.toLocaleString('es-ES'),dec:dec};
+}
+function fmtFull(n){var p=fmtParts(n);return p.int+','+p.dec+'€';}
+function fmtDate(d){return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-  function renderGoals() {
-    const list = document.getElementById('goals-list');
-    if (!state.goals.length) { list.innerHTML = ''; return; }
-    const labels = { daily:'Diaria', monthly:'Mensual', annual:'Anual' };
-    const badgeCls = { daily:'badge-daily', monthly:'badge-monthly', annual:'badge-annual' };
-    const fillCls = { daily:'fill-daily', monthly:'fill-monthly', annual:'fill-annual' };
-    list.innerHTML = state.goals.map((g,i) => {
-      const pct = Math.min(100, (state.balance / g.target) * 100);
-      const done = pct >= 100;
-      const cur = fmtFull(Math.min(state.balance, g.target));
-      const tgt = fmtFull(g.target);
-      return `<div class="goal-item">
-        <div class="goal-header">
-          <div style="display:flex;align-items:center">
-            <span class="goal-name">${esc(g.name)}</span>
-            <span class="goal-badge ${badgeCls[g.type]}">${labels[g.type]}</span>
-          </div>
-          <button class="goal-delete" onclick="deleteGoal(${i})">×</button>
-        </div>
-        <div class="goal-bar"><div class="goal-fill ${fillCls[g.type]}" style="width:${pct.toFixed(1)}%"></div></div>
-        <div class="goal-amounts">
-          <span class="goal-cur ${done?'goal-done':''}">${cur}${done?' ✓':''}</span>
-          <span class="goal-tgt">de ${tgt} · ${Math.round(pct)}%</span>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function renderHistory() {
-    const list = document.getElementById('tx-list');
-    if (!state.transactions.length) {
-      list.innerHTML = '<div class="empty-state">Sin transacciones aún</div>';
-      return;
-    }
-    list.innerHTML = [...state.transactions].reverse().map(tx => {
-      const { int, dec } = fmtParts(tx.amount);
-      const sign = tx.type === 'add' ? '+' : '−';
-      return `<div class="tx-item">
-        <div class="tx-dot ${tx.type}"></div>
-        <div class="tx-info">
-          <div class="tx-comment ${tx.comment?'':'empty'}">${tx.comment ? esc(tx.comment) : 'Sin comentario'}</div>
-          <div class="tx-date">${fmtDate(tx.date)}</div>
-        </div>
-        <div class="tx-amount ${tx.type}">${sign}${int},${dec}€</div>
-      </div>`;
-    }).join('');
-  }
-
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  /* ── MODAL ── */
-  let modalMode = 'add';
-
-  function openModal(mode) {
-    modalMode = mode;
-    const overlay = document.getElementById('overlay');
-    const title = document.getElementById('modal-title');
-    const txf = document.getElementById('tx-form');
-    const gf = document.getElementById('goal-form');
-    const btn = document.getElementById('btn-tx');
-
-    clearErrors();
-    document.getElementById('f-amount').value = '';
-    document.getElementById('f-comment').value = '';
-    document.getElementById('f-gname').value = '';
-    document.getElementById('f-gtarget').value = '';
-
-    if (mode === 'add') {
-      txf.style.display = 'block'; gf.style.display = 'none';
-      title.innerHTML = 'Añadir <span class="gc">dinero</span>';
-      btn.className = 'btn-confirm add';
-    } else if (mode === 'remove') {
-      txf.style.display = 'block'; gf.style.display = 'none';
-      title.innerHTML = 'Retirar <span class="rc">dinero</span>';
-      btn.className = 'btn-confirm remove';
-    } else {
-      txf.style.display = 'none'; gf.style.display = 'block';
-      title.textContent = 'Nueva meta de ahorro';
-    }
-
-    overlay.classList.add('open');
-    setTimeout(() => {
-      const f = mode === 'goal' ? document.getElementById('f-gname') : document.getElementById('f-amount');
-      f.focus();
-    }, 280);
-  }
-
-  function closeModal() {
-    document.getElementById('overlay').classList.remove('open');
-  }
-
-  function outsideClick(e) {
-    if (e.target.id === 'overlay') closeModal();
-  }
-
-  function clearErrors() {
-    ['err-amount','err-gname','err-gtarget'].forEach(id => {
-      const el = document.getElementById(id);
-      el.className = 'error-msg'; el.textContent = '';
-    });
-    ['f-amount','f-comment','f-gname','f-gtarget'].forEach(id => {
-      document.getElementById(id).classList.remove('error');
-    });
-  }
-
-  function showError(fieldId, errId, msg) {
-    document.getElementById(fieldId).classList.add('error');
-    const e = document.getElementById(errId);
-    e.textContent = msg; e.className = 'error-msg show';
-  }
-
-  function confirmTx() {
-    clearErrors();
-    const raw = parseFloat(document.getElementById('f-amount').value);
-    if (!raw || raw <= 0 || isNaN(raw)) {
-      showError('f-amount','err-amount','Introduce una cantidad válida'); return;
-    }
-    const amount = Math.round(raw * 100) / 100;
-    if (modalMode === 'remove' && amount > state.balance) {
-      showError('f-amount','err-amount','No tienes suficiente saldo'); return;
-    }
-    const comment = document.getElementById('f-comment').value.trim();
-    const change = modalMode === 'add' ? amount : -amount;
-    state.balance = Math.round((state.balance + change) * 100) / 100;
-    state.transactions.push({ type: modalMode, amount, comment, date: new Date() });
-    closeModal();
-    render(change);
-  }
-
-  function confirmGoal() {
-    clearErrors();
-    const name = document.getElementById('f-gname').value.trim();
-    const raw = parseFloat(document.getElementById('f-gtarget').value);
-    let ok = true;
-    if (!name) { showError('f-gname','err-gname','Escribe un nombre para la meta'); ok = false; }
-    if (!raw || raw <= 0 || isNaN(raw)) { showError('f-gtarget','err-gtarget','Introduce un objetivo válido'); ok = false; }
-    if (!ok) return;
-    const type = document.getElementById('f-gtype').value;
-    state.goals.push({ name, target: Math.round(raw * 100) / 100, type });
-    closeModal();
-    render();
-  }
-
-  function deleteGoal(i) {
-    state.goals.splice(i, 1);
-    render();
-  }
-
-  /* ── KEYBOARD ── */
-  document.addEventListener('keydown', e => {
-    if (!document.getElementById('overlay').classList.contains('open')) return;
-    if (e.key === 'Escape') closeModal();
-    if (e.key === 'Enter') {
-      if (document.getElementById('goal-form').style.display !== 'none') confirmGoal();
-      else confirmTx();
-    }
+function goalExpiry(g){
+  var e=new Date(g.startDate);
+  if(g.type==='daily')e.setDate(e.getDate()+1);
+  if(g.type==='monthly')e.setMonth(e.getMonth()+1);
+  if(g.type==='annual')e.setFullYear(e.getFullYear()+1);
+  return e;
+}
+function goalCountdown(g){
+  var diff=goalExpiry(g).getTime()-Date.now();
+  if(diff<=0)return{text:'Expirada',urgent:true};
+  var d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000);
+  if(d>0)return{text:'Expira en '+d+'d '+h+'h',urgent:d<=1};
+  if(h>0)return{text:'Expira en '+h+'h '+m+'m',urgent:true};
+  return{text:'Expira en '+m+' min',urgent:true};
+}
+function goalProgress(g){
+  var start=new Date(g.startDate).getTime(),sum=0;
+  S.transactions.forEach(function(tx){
+    if(new Date(tx.date).getTime()>=start)sum+=tx.type==='add'?tx.amount:-tx.amount;
   });
+  return Math.round(sum*100)/100;
+}
 
-  /* ── SERVICE WORKER ── */
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/mi-hucha/sw.js').catch(() => {});
+function render(change){
+  var p=fmtParts(S.balance);
+  document.getElementById('bal-int').textContent=p.int;
+  document.getElementById('bal-dec').textContent=','+p.dec;
+  var el=document.getElementById('balance-el');
+  el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+  if(change!==undefined){
+    var ch=document.getElementById('bal-change');
+    ch.textContent=(change>=0?'+':'−')+fmtFull(Math.abs(change));
+    ch.className='balance-change '+(change>=0?'pos':'neg');
+    clearTimeout(window._ct);
+    window._ct=setTimeout(function(){ch.textContent='\u00a0';ch.className='balance-change';},3000);
   }
+  renderGoals();renderHistory();save();
+}
 
-  /* ── INIT ── */
-  load();
-  render();
+function renderGoals(){
+  var list=document.getElementById('goals-list');
+  if(!S.goals.length){list.innerHTML='';return;}
+  var labels={daily:'Diaria',monthly:'Mensual',annual:'Anual'};
+  var bc={daily:'badge-daily',monthly:'badge-monthly',annual:'badge-annual'};
+  var fc={daily:'fill-daily',monthly:'fill-monthly',annual:'fill-annual'};
+  list.innerHTML=S.goals.map(function(g,i){
+    var prog=goalProgress(g);
+    var pct=g.target>0?Math.min(100,Math.max(0,(prog/g.target)*100)):0;
+    var done=prog>=g.target;
+    var cd=goalCountdown(g);
+    var cc=done?'done':prog<0?'neg':prog>0?'pos':'';
+    var sign=prog>=0?'+':'';
+    return '<div class="goal-item">'+
+      '<div class="goal-header">'+
+        '<div class="goal-header-left">'+
+          '<div class="goal-name">'+esc(g.name)+'<span class="goal-badge '+bc[g.type]+'">'+labels[g.type]+'</span></div>'+
+          '<div class="goal-countdown'+(cd.urgent?' urgent':'')+'">'+cd.text+'</div>'+
+        '</div>'+
+        '<button class="goal-delete" onclick="deleteGoal('+i+')">×</button>'+
+      '</div>'+
+      '<div class="goal-bar"><div class="goal-fill '+fc[g.type]+'" style="width:'+pct.toFixed(1)+'%"></div></div>'+
+      '<div class="goal-amounts">'+
+        '<span class="goal-cur '+cc+'">'+sign+fmtFull(prog)+(done?' ✓':'')+'</span>'+
+        '<span class="goal-tgt">de '+fmtFull(g.target)+' · '+Math.round(pct)+'%</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderHistory(){
+  var list=document.getElementById('tx-list');
+  if(!S.transactions.length){list.innerHTML='<div class="empty-state">Sin transacciones aún</div>';return;}
+  var running=0;
+  var withTotals=S.transactions.map(function(tx){
+    running=Math.round((running+(tx.type==='add'?tx.amount:-tx.amount))*100)/100;
+    return Object.assign({},tx,{runningTotal:running});
+  });
+  list.innerHTML=withTotals.slice().reverse().map(function(tx){
+    var p=fmtParts(tx.amount);
+    var sign=tx.type==='add'?'+':'−';
+    return '<div class="tx-item">'+
+      '<div class="tx-dot '+tx.type+'"></div>'+
+      '<div class="tx-info">'+
+        '<div class="tx-comment'+(tx.comment?'':' empty')+'">'+(tx.comment?esc(tx.comment):'Sin comentario')+'</div>'+
+        '<div class="tx-date">'+fmtDate(tx.date)+'</div>'+
+      '</div>'+
+      '<div class="tx-right">'+
+        '<div class="tx-amount '+tx.type+'">'+sign+p.int+','+p.dec+'€</div>'+
+        '<div class="tx-total">Total: '+fmtFull(tx.runningTotal)+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+var modalMode='add';
+function openModal(mode){
+  modalMode=mode;
+  var txf=document.getElementById('tx-form'),gf=document.getElementById('goal-form'),sf=document.getElementById('settings-form');
+  txf.style.display='none';gf.style.display='none';sf.style.display='none';
+  clearErrors();
+  ['f-amount','f-comment','f-gname','f-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var title=document.getElementById('modal-title');
+  if(mode==='add'){txf.style.display='block';title.innerHTML='Añadir <span class="gc">dinero</span>';document.getElementById('btn-tx').className='btn-confirm add';}
+  else if(mode==='remove'){txf.style.display='block';title.innerHTML='Retirar <span class="rc">dinero</span>';document.getElementById('btn-tx').className='btn-confirm remove';}
+  else if(mode==='goal'){gf.style.display='block';title.textContent='Nueva meta de ahorro';}
+  else if(mode==='settings'){
+    sf.style.display='block';title.textContent='Ajustes';
+    var sw=document.getElementById('lock-switch');
+    sw.className='toggle-switch'+(S.lockEnabled?' on':'');
+    document.getElementById('lock-sub').textContent=S.lockEnabled?('PIN de '+S.pinLen+' dígitos activo'):'La app se bloqueará al abrirla';
+    document.getElementById('change-pin-btn').style.display=S.lockEnabled?'block':'none';
+  }
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(function(){
+    var f=mode==='goal'?document.getElementById('f-gname'):(mode==='add'||mode==='remove')?document.getElementById('f-amount'):null;
+    if(f)f.focus();
+  },280);
+}
+function openSettings(){openModal('settings');}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function outsideClick(e){if(e.target.id==='overlay')closeModal();}
+function clearErrors(){
+  ['err-amount','err-gname','err-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el){el.className='error-msg';el.textContent='';}});
+  ['f-amount','f-gname','f-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});
+}
+function showError(fId,eId,msg){
+  document.getElementById(fId).classList.add('error');
+  var e=document.getElementById(eId);e.textContent=msg;e.className='error-msg show';
+}
+function confirmTx(){
+  clearErrors();
+  var raw=parseFloat(document.getElementById('f-amount').value);
+  if(!raw||raw<=0||isNaN(raw)){showError('f-amount','err-amount','Introduce una cantidad válida');return;}
+  var amount=Math.round(raw*100)/100;
+  if(modalMode==='remove'&&amount>S.balance){showError('f-amount','err-amount','No tienes suficiente saldo');return;}
+  var comment=document.getElementById('f-comment').value.trim();
+  var change=modalMode==='add'?amount:-amount;
+  S.balance=Math.round((S.balance+change)*100)/100;
+  S.transactions.push({type:modalMode,amount:amount,comment:comment,date:new Date()});
+  closeModal();render(change);
+}
+function confirmGoal(){
+  clearErrors();
+  var name=document.getElementById('f-gname').value.trim();
+  var raw=parseFloat(document.getElementById('f-gtarget').value);
+  var ok=true;
+  if(!name){showError('f-gname','err-gname','Escribe un nombre');ok=false;}
+  if(!raw||raw<=0||isNaN(raw)){showError('f-gtarget','err-gtarget','Introduce un objetivo válido');ok=false;}
+  if(!ok)return;
+  var type=document.getElementById('f-gtype').value;
+  S.goals.push({name:name,target:Math.round(raw*100)/100,type:type,startDate:new Date()});
+  closeModal();render();
+}
+function deleteGoal(i){S.goals.splice(i,1);render();}
+
+function toggleLock(){
+  if(S.lockEnabled){S.lockEnabled=false;S.pin=null;save();openModal('settings');}
+  else{closeModal();setTimeout(function(){showPinLengthScreen('setup');},200);}
+}
+function startChangePIN(){closeModal();setTimeout(function(){showPinLengthScreen('change');},200);}
+
+var pinFlowCtx='setup';
+function showPinLengthScreen(ctx){pinFlowCtx=ctx;document.getElementById('pin-length-screen').style.display='flex';}
+function choosePinLength(len){S.pinLen=len;document.getElementById('pin-length-screen').style.display='none';startSetupPIN();}
+
+var setupStep=1,setupFirst='',setupCurrent='';
+function startSetupPIN(){
+  setupStep=1;setupFirst='';setupCurrent='';
+  updateSetupUI();updateSetupDots();
+  document.getElementById('setup-screen').style.display='flex';
+}
+function updateSetupDots(state2){
+  var dots=document.getElementById('setup-dots');
+  var html='';
+  for(var i=0;i<S.pinLen;i++){
+    var cls='pin-dot';
+    if(i<setupCurrent.length)cls+=state2?' '+state2:' filled';
+    html+='<div class="'+cls+'"></div>';
+  }
+  dots.innerHTML=html;
+}
+function updateSetupUI(){
+  var steps=document.getElementById('setup-steps');
+  steps.innerHTML='<div class="setup-step-dot'+(setupStep===1?' active':'')+'"></div><div class="setup-step-dot'+(setupStep===2?' active':'')+'"></div>';
+  if(setupStep===1){
+    document.getElementById('setup-title').textContent='Crea tu PIN';
+    document.getElementById('setup-subtitle').textContent='Elige un PIN de '+S.pinLen+' dígitos';
+  }else{
+    document.getElementById('setup-title').textContent='Confirma el PIN';
+    document.getElementById('setup-subtitle').textContent='Vuelve a introducir tu PIN';
+  }
+}
+function setupKey(d){
+  if(setupCurrent.length>=S.pinLen)return;
+  setupCurrent+=d;updateSetupDots();
+  if(setupCurrent.length===S.pinLen){
+    setTimeout(function(){
+      if(setupStep===1){
+        setupFirst=setupCurrent;setupCurrent='';setupStep=2;updateSetupUI();updateSetupDots();
+      }else{
+        if(setupCurrent===setupFirst){
+          S.pin=setupCurrent;S.lockEnabled=true;save();
+          updateSetupDots('success');
+          setTimeout(function(){document.getElementById('setup-screen').style.display='none';},500);
+        }else{
+          updateSetupDots('error');
+          var dots=document.getElementById('setup-dots');dots.classList.add('shake');
+          setTimeout(function(){
+            dots.classList.remove('shake');
+            setupStep=1;setupFirst='';setupCurrent='';updateSetupUI();updateSetupDots();
+            document.getElementById('setup-subtitle').textContent='Los PINs no coinciden. Inténtalo de nuevo.';
+          },400);
+        }
+      }
+    },80);
+  }
+}
+function setupDel(){if(setupCurrent.length>0){setupCurrent=setupCurrent.slice(0,-1);updateSetupDots();}}
+
+var pinCurrent='',pinAttempts=0,pinBlockedUntil=0;
+var MAX_ATTEMPTS=3,BLOCK_MS=60000;
+function showLockScreen(){
+  pinCurrent='';updatePinDots();
+  document.getElementById('pin-screen').style.display='flex';
+  document.getElementById('main-app').style.display='none';
+  checkBlocked();
+}
+function updatePinDots(state2){
+  var dots=document.getElementById('pin-dots');var html='';
+  for(var i=0;i<S.pinLen;i++){
+    var cls='pin-dot';
+    if(i<pinCurrent.length)cls+=state2?' '+state2:' filled';
+    html+='<div class="'+cls+'"></div>';
+  }
+  dots.innerHTML=html;
+}
+function checkBlocked(){
+  var now=Date.now();
+  if(pinBlockedUntil>now){
+    var secs=Math.ceil((pinBlockedUntil-now)/1000);
+    var bl=document.getElementById('pin-blocked');
+    bl.style.display='block';bl.textContent='Bloqueado. Espera '+secs+'s';
+    document.querySelectorAll('#pin-screen .pin-key').forEach(function(k){k.style.opacity='0.3';});
+    setTimeout(checkBlocked,1000);
+  }else{
+    document.getElementById('pin-blocked').style.display='none';
+    document.getElementById('pin-subtitle').textContent=pinAttempts>0?('Intentos restantes: '+(MAX_ATTEMPTS-pinAttempts)):'\u00a0';
+    document.querySelectorAll('#pin-screen .pin-key').forEach(function(k){k.style.opacity='1';});
+  }
+}
+function pinKey(d){
+  if(Date.now()<pinBlockedUntil)return;
+  if(pinCurrent.length>=S.pinLen)return;
+  pinCurrent+=d;updatePinDots();
+  if(pinCurrent.length===S.pinLen){
+    setTimeout(function(){
+      if(pinCurrent===S.pin){
+        updatePinDots('success');
+        setTimeout(unlockApp,300);
+      }else{
+        pinAttempts++;
+        updatePinDots('error');
+        var dots=document.getElementById('pin-dots');dots.classList.add('shake');
+        setTimeout(function(){dots.classList.remove('shake');},400);
+        if(pinAttempts>=MAX_ATTEMPTS){pinAttempts=0;pinBlockedUntil=Date.now()+BLOCK_MS;}
+        setTimeout(function(){pinCurrent='';updatePinDots();checkBlocked();},400);
+      }
+    },80);
+  }
+}
+function pinDel(){if(Date.now()<pinBlockedUntil)return;if(pinCurrent.length>0){pinCurrent=pinCurrent.slice(0,-1);updatePinDots();}}
+function unlockApp(){pinAttempts=0;pinCurrent='';document.getElementById('pin-screen').style.display='none';document.getElementById('main-app').style.display='block';render();}
+
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('pin-screen').style.display!=='none'){
+    if(e.key>='0'&&e.key<='9')pinKey(e.key);
+    if(e.key==='Backspace')pinDel();return;
+  }
+  if(document.getElementById('setup-screen').style.display!=='none'){
+    if(e.key>='0'&&e.key<='9')setupKey(e.key);
+    if(e.key==='Backspace')setupDel();return;
+  }
+  if(!document.getElementById('overlay').classList.contains('open'))return;
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'){
+    if(document.getElementById('goal-form').style.display!=='none')confirmGoal();
+    else if(document.getElementById('tx-form').style.display!=='none')confirmTx();
+  }
+});
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/mi-hucha/sw.js').catch(function(){});}
+
+load();
+if(S.lockEnabled&&S.pin){showLockScreen();}
+else{document.getElementById('main-app').style.display='block';render();}
+setInterval(function(){if(S.goals.length)renderGoals();},30000);
 </script>
+
 </body>
 </html>
