@@ -122,6 +122,13 @@
     .shake{animation:shake .35s ease;}
     @keyframes popIn{0%{transform:scale(1)}40%{transform:scale(1.03)}100%{transform:scale(1)}}
     .pop{animation:popIn .3s ease;}
+    .tx-item{cursor:pointer;}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+    .seg button{padding:12px;border-radius:12px;border:1px solid #2a2a2a;background:var(--bg3);color:var(--text3);font-family:inherit;font-size:14px;cursor:pointer;}
+    .seg button.on.add{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+    .seg button.on.remove{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+    .btn-danger{width:100%;padding:13px;border-radius:14px;border:1px solid var(--red-border);background:transparent;color:var(--red);font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit;}
+    .debt-total{font-family:'DM Mono',monospace;color:#eab341;letter-spacing:0;}
   </style>
 </head>
 <body>
@@ -206,6 +213,10 @@
   <div id="goals-list"></div>
   <button class="add-goal-btn" onclick="openModal('goal')">+ Nueva meta</button>
   <div class="divider"></div>
+  <div class="section-title">Me deben <span class="debt-total" id="debt-total"></span></div>
+  <div id="debts-list"></div>
+  <button class="add-goal-btn" onclick="openModal('debt')">+ Nueva deuda</button>
+  <div class="divider"></div>
   <div class="section-title">Historial</div>
   <div id="tx-list"></div>
 </div>
@@ -217,6 +228,10 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-title"></div>
     <div id="tx-form">
+      <div class="seg" id="tx-type-seg" style="display:none">
+        <button id="seg-add" onclick="setEditType('add')">Ingreso</button>
+        <button id="seg-remove" onclick="setEditType('remove')">Retirada</button>
+      </div>
       <div class="input-wrap">
         <div class="input-label">Cantidad (€)</div>
         <input class="field" id="f-amount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0,00" />
@@ -227,6 +242,7 @@
         <input class="field text-field" id="f-comment" type="text" placeholder="Ej: Bizum de Pablo" maxlength="60" />
       </div>
       <button class="btn-confirm" id="btn-tx" onclick="confirmTx()">Confirmar</button>
+      <button class="btn-danger" id="btn-tx-del" style="display:none" onclick="deleteTx()">Eliminar</button>
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
     </div>
     <div id="goal-form" style="display:none">
@@ -253,6 +269,29 @@
       <button class="btn-confirm goal-c" onclick="confirmGoal()">Crear meta</button>
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
     </div>
+    <div id="debt-form" style="display:none">
+      <div class="input-wrap">
+        <div class="input-label">Quién te debe</div>
+        <input class="field text-field" id="f-dname" type="text" placeholder="Ej: Pablo" maxlength="40" />
+        <div class="error-msg" id="err-dname"></div>
+      </div>
+      <div class="input-wrap">
+        <div class="input-label">Cantidad (€)</div>
+        <input class="field" id="f-damount" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="0,00" />
+        <div class="error-msg" id="err-damount"></div>
+      </div>
+      <div class="input-wrap">
+        <div class="input-label">Concepto (opcional)</div>
+        <input class="field text-field" id="f-dnote" type="text" placeholder="Ej: Entradas del concierto" maxlength="60" />
+      </div>
+      <button class="btn-confirm goal-c" id="btn-debt" onclick="confirmDebt()">Añadir deuda</button>
+      <div id="debt-edit-actions" style="display:none">
+        <button class="btn-action btn-add" style="width:100%;margin-top:8px" onclick="collectDebt(true)">Cobrada · sumar a la hucha</button>
+        <button class="btn-cancel" onclick="collectDebt(false)">Cobrada · sin sumar</button>
+        <button class="btn-danger" onclick="deleteDebt()">Eliminar</button>
+      </div>
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
     <div id="settings-form" style="display:none">
       <div onclick="toggleLock()" class="lock-toggle">
         <div>
@@ -268,7 +307,7 @@
 </div>
 
 <script>
-var S = { balance:0, transactions:[], goals:[], pin:null, pinLen:4, lockEnabled:false };
+var S = { balance:0, transactions:[], goals:[], debts:[], pin:null, pinLen:4, lockEnabled:false };
 
 function load(){
   try{
@@ -278,6 +317,7 @@ function load(){
       S.balance=p.balance||0;
       S.transactions=(p.transactions||[]).map(function(t){return Object.assign({},t,{date:new Date(t.date)});});
       S.goals=(p.goals||[]).map(function(g){return Object.assign({},g,{startDate:new Date(g.startDate)});});
+      S.debts=(p.debts||[]).map(function(d){return Object.assign({},d,{date:new Date(d.date)});});
       S.pin=p.pin||null;
       S.pinLen=p.pinLen||4;
       S.lockEnabled=p.lockEnabled||false;
@@ -330,7 +370,7 @@ function render(change){
     clearTimeout(window._ct);
     window._ct=setTimeout(function(){ch.textContent='\u00a0';ch.className='balance-change';},3000);
   }
-  renderGoals();renderHistory();save();
+  renderGoals();renderDebts();renderHistory();save();
 }
 
 function renderGoals(){
@@ -367,14 +407,14 @@ function renderHistory(){
   var list=document.getElementById('tx-list');
   if(!S.transactions.length){list.innerHTML='<div class="empty-state">Sin transacciones aún</div>';return;}
   var running=0;
-  var withTotals=S.transactions.map(function(tx){
+  var withTotals=S.transactions.map(function(tx,idx){
     running=Math.round((running+(tx.type==='add'?tx.amount:-tx.amount))*100)/100;
-    return Object.assign({},tx,{runningTotal:running});
+    return Object.assign({},tx,{runningTotal:running,idx:idx});
   });
   list.innerHTML=withTotals.slice().reverse().map(function(tx){
     var p=fmtParts(tx.amount);
     var sign=tx.type==='add'?'+':'−';
-    return '<div class="tx-item">'+
+    return '<div class="tx-item" onclick="openEditTx('+tx.idx+')">'+
       '<div class="tx-dot '+tx.type+'"></div>'+
       '<div class="tx-info">'+
         '<div class="tx-comment'+(tx.comment?'':' empty')+'">'+(tx.comment?esc(tx.comment):'Sin comentario')+'</div>'+
@@ -393,12 +433,18 @@ function openModal(mode){
   modalMode=mode;
   var txf=document.getElementById('tx-form'),gf=document.getElementById('goal-form'),sf=document.getElementById('settings-form');
   txf.style.display='none';gf.style.display='none';sf.style.display='none';
+  editTxIdx=-1;editDebtIdx=-1;
+  document.getElementById('debt-form').style.display='none';
+  document.getElementById('tx-type-seg').style.display='none';
+  document.getElementById('btn-tx-del').style.display='none';
+  document.getElementById('btn-tx').textContent='Confirmar';
   clearErrors();
-  ['f-amount','f-comment','f-gname','f-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['f-amount','f-comment','f-gname','f-gtarget','f-dname','f-damount','f-dnote'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   var title=document.getElementById('modal-title');
   if(mode==='add'){txf.style.display='block';title.innerHTML='Añadir <span class="gc">dinero</span>';document.getElementById('btn-tx').className='btn-confirm add';}
   else if(mode==='remove'){txf.style.display='block';title.innerHTML='Retirar <span class="rc">dinero</span>';document.getElementById('btn-tx').className='btn-confirm remove';}
   else if(mode==='goal'){gf.style.display='block';title.textContent='Nueva meta de ahorro';}
+  else if(mode==='debt'){document.getElementById('debt-form').style.display='block';title.textContent='Nueva deuda';document.getElementById('btn-debt').textContent='Añadir deuda';document.getElementById('debt-edit-actions').style.display='none';}
   else if(mode==='settings'){
     sf.style.display='block';title.textContent='Ajustes';
     var sw=document.getElementById('lock-switch');
@@ -408,22 +454,23 @@ function openModal(mode){
   }
   document.getElementById('overlay').classList.add('open');
   setTimeout(function(){
-    var f=mode==='goal'?document.getElementById('f-gname'):(mode==='add'||mode==='remove')?document.getElementById('f-amount'):null;
-    if(f)f.focus();
+    var f=mode==='debt'?document.getElementById('f-dname'):mode==='goal'?document.getElementById('f-gname'):(mode==='add'||mode==='remove')?document.getElementById('f-amount'):null;
+    if(f&&editTxIdx<0&&editDebtIdx<0)f.focus();
   },280);
 }
 function openSettings(){openModal('settings');}
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
 function outsideClick(e){if(e.target.id==='overlay')closeModal();}
 function clearErrors(){
-  ['err-amount','err-gname','err-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el){el.className='error-msg';el.textContent='';}});
-  ['f-amount','f-gname','f-gtarget'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});
+  ['err-amount','err-gname','err-gtarget','err-dname','err-damount'].forEach(function(id){var el=document.getElementById(id);if(el){el.className='error-msg';el.textContent='';}});
+  ['f-amount','f-gname','f-gtarget','f-dname','f-damount'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});
 }
 function showError(fId,eId,msg){
   document.getElementById(fId).classList.add('error');
   var e=document.getElementById(eId);e.textContent=msg;e.className='error-msg show';
 }
 function confirmTx(){
+  if(editTxIdx>=0){saveTxEdit();return;}
   clearErrors();
   var raw=parseFloat(document.getElementById('f-amount').value);
   if(!raw||raw<=0||isNaN(raw)){showError('f-amount','err-amount','Introduce una cantidad válida');return;}
@@ -448,6 +495,92 @@ function confirmGoal(){
   closeModal();render();
 }
 function deleteGoal(i){S.goals.splice(i,1);render();}
+
+/* EDITAR TRANSACCIONES */
+var editTxIdx=-1,editDebtIdx=-1,editType='add';
+function paintSeg(){['add','remove'].forEach(function(k){document.getElementById('seg-'+k).className=k+(editType===k?' on':'');});}
+function setEditType(t){editType=t;paintSeg();}
+function openEditTx(i){
+  var tx=S.transactions[i];if(!tx)return;
+  openModal(tx.type);
+  editTxIdx=i;editType=tx.type;
+  document.getElementById('modal-title').textContent='Editar transacción';
+  document.getElementById('tx-type-seg').style.display='grid';
+  document.getElementById('btn-tx-del').style.display='block';
+  var b=document.getElementById('btn-tx');b.textContent='Guardar';b.className='btn-confirm goal-c';
+  document.getElementById('f-amount').value=tx.amount;
+  document.getElementById('f-comment').value=tx.comment||'';
+  paintSeg();
+}
+function saveTxEdit(){
+  clearErrors();
+  var raw=parseFloat(document.getElementById('f-amount').value);
+  if(!raw||raw<=0||isNaN(raw)){showError('f-amount','err-amount','Introduce una cantidad válida');return;}
+  var amount=Math.round(raw*100)/100,tx=S.transactions[editTxIdx];
+  var oldEff=tx.type==='add'?tx.amount:-tx.amount,newEff=editType==='add'?amount:-amount;
+  var nb=Math.round((S.balance-oldEff+newEff)*100)/100;
+  if(nb<0){showError('f-amount','err-amount','El saldo quedaría en negativo');return;}
+  S.balance=nb;tx.type=editType;tx.amount=amount;tx.comment=document.getElementById('f-comment').value.trim();
+  var diff=Math.round((newEff-oldEff)*100)/100;
+  closeModal();render(diff||undefined);
+}
+function deleteTx(){
+  var tx=S.transactions[editTxIdx];if(!tx)return;
+  var eff=tx.type==='add'?tx.amount:-tx.amount,nb=Math.round((S.balance-eff)*100)/100;
+  if(nb<0){showError('f-amount','err-amount','Si la eliminas, el saldo quedaría en negativo');return;}
+  if(!confirm('¿Eliminar esta transacción?'))return;
+  S.transactions.splice(editTxIdx,1);S.balance=nb;closeModal();render(-eff);
+}
+
+/* DEUDAS (me deben) */
+function renderDebts(){
+  var list=document.getElementById('debts-list'),tot=0;
+  S.debts.forEach(function(d){tot+=d.amount;});
+  document.getElementById('debt-total').textContent=S.debts.length?'· '+fmtFull(Math.round(tot*100)/100):'';
+  if(!S.debts.length){list.innerHTML='<div class="empty-state">Nadie te debe nada</div>';return;}
+  list.innerHTML=S.debts.map(function(d,i){
+    return '<div class="tx-item" onclick="openEditDebt('+i+')">'+
+      '<div class="tx-dot" style="background:#eab341"></div>'+
+      '<div class="tx-info"><div class="tx-comment">'+esc(d.person)+(d.note?' · '+esc(d.note):'')+'</div><div class="tx-date">'+fmtDate(d.date)+'</div></div>'+
+      '<div class="tx-right"><div class="tx-amount" style="color:#eab341">'+fmtFull(d.amount)+'</div></div>'+
+    '</div>';
+  }).join('');
+}
+function openEditDebt(i){
+  var d=S.debts[i];if(!d)return;
+  openModal('debt');
+  editDebtIdx=i;
+  document.getElementById('modal-title').textContent='Editar deuda';
+  document.getElementById('btn-debt').textContent='Guardar';
+  document.getElementById('debt-edit-actions').style.display='block';
+  document.getElementById('f-dname').value=d.person;
+  document.getElementById('f-damount').value=d.amount;
+  document.getElementById('f-dnote').value=d.note||'';
+}
+function confirmDebt(){
+  clearErrors();
+  var person=document.getElementById('f-dname').value.trim();
+  var raw=parseFloat(document.getElementById('f-damount').value),ok=true;
+  if(!person){showError('f-dname','err-dname','Escribe un nombre');ok=false;}
+  if(!raw||raw<=0||isNaN(raw)){showError('f-damount','err-damount','Introduce una cantidad válida');ok=false;}
+  if(!ok)return;
+  var note=document.getElementById('f-dnote').value.trim(),amount=Math.round(raw*100)/100;
+  if(editDebtIdx>=0){var d=S.debts[editDebtIdx];d.person=person;d.amount=amount;d.note=note;}
+  else S.debts.push({person:person,amount:amount,note:note,date:new Date()});
+  closeModal();render();
+}
+function collectDebt(toHucha){
+  var d=S.debts[editDebtIdx];if(!d)return;
+  S.debts.splice(editDebtIdx,1);
+  var change;
+  if(toHucha){
+    S.balance=Math.round((S.balance+d.amount)*100)/100;
+    S.transactions.push({type:'add',amount:d.amount,comment:'Cobro de '+d.person+(d.note?' · '+d.note:''),date:new Date()});
+    change=d.amount;
+  }
+  closeModal();render(change);
+}
+function deleteDebt(){if(!confirm('¿Eliminar esta deuda?'))return;S.debts.splice(editDebtIdx,1);closeModal();render();}
 
 function toggleLock(){
   if(S.lockEnabled){S.lockEnabled=false;S.pin=null;save();openModal('settings');}
@@ -579,7 +712,8 @@ document.addEventListener('keydown',function(e){
   if(!document.getElementById('overlay').classList.contains('open'))return;
   if(e.key==='Escape')closeModal();
   if(e.key==='Enter'){
-    if(document.getElementById('goal-form').style.display!=='none')confirmGoal();
+    if(document.getElementById('debt-form').style.display==='block')confirmDebt();
+    else if(document.getElementById('goal-form').style.display!=='none')confirmGoal();
     else if(document.getElementById('tx-form').style.display!=='none')confirmTx();
   }
 });
